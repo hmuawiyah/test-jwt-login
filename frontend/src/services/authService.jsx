@@ -11,7 +11,7 @@ export const login = (email, password) => {
 };
 
 export const getUser = (token) => {
-  return axios.get(`${API_URL}/me`, {
+  return axios.get(`${API_URL}/profile`, {
     headers: { Authorization: `Bearer ${token}` }
   });
 };

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { login } from '../services/authService'
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -9,9 +9,10 @@ export default function Login() {
 
   const handleSubmit = async e => {
     e.preventDefault()
+    const res = await login(email, password)
     try {
-      const res = await login(email, password)
       localStorage.setItem('token', res.data.token)
+      console.log("res.data.token: "+res.data.token)
       alert("Login berhasil!")
       navigate('/profile')
     } catch (err) {
@@ -20,11 +21,17 @@ export default function Login() {
   }
 
   return (
+    <div>
     <form onSubmit={handleSubmit}>
       <h2>Login</h2>
       <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Email" />
       <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Password" />
       <button type="submit">Login</button>
     </form>
+
+    <br />
+
+    <span>don't have an account? </span><Link to={"/register"}>Register here!</Link>
+    </div>
   )
 }

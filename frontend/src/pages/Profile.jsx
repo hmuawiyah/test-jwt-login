@@ -19,6 +19,7 @@ export default function Profile() {
         localStorage.removeItem('token')
         navigate('/login')
       })
+      
   }, [navigate])
 
   const handleLogout = () => {
@@ -32,6 +33,7 @@ export default function Profile() {
     <div>
       <h2>Profile</h2>
       <p>Email: {user.email}</p>
+      <p>Role: {user.role}</p>
       <button onClick={handleLogout}>Logout</button>
     </div>
   )
