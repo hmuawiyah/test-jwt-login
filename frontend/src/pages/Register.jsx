@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { register } from '../services/authService'
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom'
 
 export default function Register() {
   const [email, setEmail] = useState('')
@@ -14,7 +14,8 @@ export default function Register() {
       alert("Registrasi berhasil!")
       navigate("/login")
     } catch (err) {
-      alert(err.response.data.message)
+      alert("Email telah digunakan")
+      console.log(err.message)
     }
   }
 

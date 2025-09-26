@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { login } from '../services/authService'
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom'
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -13,6 +13,7 @@ export default function Login() {
     try {
       localStorage.setItem('token', res.data.token)
       console.log("res.data.token: "+res.data.token)
+      console.log("res.data: "+res.data)
       alert("Login berhasil!")
       navigate('/profile')
     } catch (err) {
