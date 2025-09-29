@@ -8,8 +8,8 @@ export const getTask = (token) => {
   })
 }
 
-export const postTask = (title, description, staffId, status) => {
-  return axios.post(`${API_URL}/`, { title, description, staffId, status }, {
+export const postTask = (token, updatedData) => {
+  return axios.post(`${API_URL}/`, updatedData, {
     headers: { Authorization: `Bearer ${token}` }
   })
 }
