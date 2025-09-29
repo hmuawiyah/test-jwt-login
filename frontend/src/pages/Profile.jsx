@@ -232,7 +232,7 @@ export default function Profile() {
       <button onClick={() => setShowListUser(!showListUser)}>{showListUser ? "Close User & Task List" : "Open User & Task List"}</button>
       )}
 
-      {true && (<div>
+      {showListUser && (<div>
         
       <hr />
 {/* --------------------------------------------------- REGISTER USER */}
