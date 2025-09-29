@@ -1,0 +1,28 @@
+import axios from 'axios'
+
+const API_URL = 'http://localhost:5001/api/task'
+
+export const getTask = (token) => {
+  return axios.get(`${API_URL}/`, {
+    headers: { Authorization: `Bearer ${token}` }
+  })
+}
+
+export const postTask = (title, description, staffId, status) => {
+  return axios.post(`${API_URL}/`, { title, description, staffId, status }, {
+    headers: { Authorization: `Bearer ${token}` }
+  })
+}
+
+export const updateTaskById = (token, id, updatedData) => {
+  return axios.put(`${API_URL}/update/${id}`, updatedData, {
+    headers: { Authorization: `Bearer ${token}` }
+  })
+}
+
+export const deleteTaskById = (token, id) => {
+  return axios.delete(`${API_URL}/delete/${id}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  })
+}
+

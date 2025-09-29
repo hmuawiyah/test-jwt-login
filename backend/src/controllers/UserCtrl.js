@@ -1,4 +1,4 @@
-import User from '../models/User.js'
+import User from "../models/User.js"
 import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
 
@@ -80,9 +80,6 @@ export async function updateByIdCtrl(req, res){
         const userAll = await User.find()
 
         res.status(200).json({ msg: "User update successfully", userAll })
-
-        console.log("Result Update by ID: "+result)
-        console.log("Success Update by ID: "+id) 
     }catch(error){
         console.log("Error on update by id: "+error.message)
     }
