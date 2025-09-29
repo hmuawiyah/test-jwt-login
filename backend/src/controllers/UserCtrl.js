@@ -16,8 +16,10 @@ export async function registerCtrl (req, res) {
         
         const newUser = new User({ email, password: hashedPassword, role })
         await newUser.save()
-            
-        res.status(201).json({ msg: "User registered successfully" })
+
+        const userAll = await User.find()
+             
+        res.status(201).json({ msg: "User registered successfully", userAll })
     }catch(error){
         console.log("Error on /register", error.message)
         res.status(400).json({ msg: "Error" })

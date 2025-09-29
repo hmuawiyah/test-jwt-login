@@ -26,11 +26,9 @@ export async function taskPostCtrl (req, res){
         const newTask = new Task({ title, description, staffId, status })
         await newTask.save()
 
-        const debugAll = await Task.find().populate("staffId")
-
-        console.log( JSON.stringify(debugAll, null, 2) )
+        const taskAll = await Task.find()
         
-        res.status(201).json({ msg: "Task posted successfully"})
+        res.status(201).json({ msg: "Task posted successfully", taskAll})
     }catch(error){
         console.log("Error on posting task", error.message)
         res.status(400).json({ msg: "Error on posting task" })
