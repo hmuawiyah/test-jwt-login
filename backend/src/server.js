@@ -11,7 +11,12 @@ const app = express()
 const PORT = process.env.PORT || 5001
 
 app.use(express.json())
-app.use(cors())
+app.use(cors({
+  origin: 'http://localhost:5173', // domain frontend kamu
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}))
+
 
 
 app.use("/api/user", userRoutes)

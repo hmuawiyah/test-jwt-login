@@ -12,23 +12,51 @@ export async function taskGetCtrl (req, res) {
     }
 }
 
+export async function taskGetByIdCtrl(req, res) {
+  try {
+    const { id } = req.params 
+    const taskAll = await Task.find({ staffId: id })
+
+    if (!taskAll) {
+      return res.status(404).json({ msg: "Task not found" })
+    } 
+
+    res.status(200).json({ taskAll })
+  } catch (error) {
+    console.log("Error on getting task by id", error.message)
+    res.status(400).json({ msg: "Error on getting task by id" })
+  }
+}
+
+
 export async function taskPostCtrl (req, res){
     let { title, description, staffId, status } = req.body
     const token = req.headers.authorization?.split(" ")[1]
     if (!token) return res.status(401).json({ msg:"No token" })
 
-    try{
+    try{  
         const decoded = jwt.verify(token, process.env.JWT_SECRET)
-        const user = await User.findById(decoded.id)
-
-        if (user.role !== "admin") return res.status(401).json({ msg:"Access Denied" })
-
+        const user = await User.findById(decoded.id) 
+        
+        if (user.role !== "admin" && user.role !== "member") return res.status(401).json({ msg:"Access Denied" })
+            
         const newTask = new Task({ title, description, staffId, status })
         await newTask.save()
 
-        const taskAll = await Task.find()
+        let taskAll
+
+        if (user.role == "admin") { 
+            taskAll = await Task.find()
+            return res.status(201).json({ msg: "Task posted successfully", taskAll})
+        }
+        else if (user.role == "member") { 
+            taskAll = await Task.find({ staffId })
+            return res.status(201).json({ msg: "Task posted successfully", taskAll})
+        }
+        else { 
+            return res.status(403).json({ msg: "Access denied" }) 
+        }
         
-        res.status(201).json({ msg: "Task posted successfully", taskAll})
     }catch(error){
         console.log("Error on posting task", error.message)
         res.status(400).json({ msg: "Error on posting task" })
@@ -52,14 +80,24 @@ export async function taskUpdateByIdCtrl (req, res){
         const decoded = jwt.verify(token, process.env.JWT_SECRET)
         const user = await User.findById(decoded.id)
 
-        if (user.role !== "admin") return res.status(401).json({ msg:"Access Denied" })
+        if (user.role !== "admin" && user.role !== "member") return res.status(401).json({ msg:"Access Denied" })
 
         const result = await Task.findByIdAndUpdate(id, updateData, { new: true })
-        const taskAll = await Task.find()
-            
-        res.status(201).json({ msg: "Task updated successfully", taskAll})
-        // console.log("Result Update by ID: "+result)
-        // console.log("Success Update by ID: "+id)
+
+        let taskAll
+
+        if (user.role == "admin") { 
+            taskAll = await Task.find()
+            return res.status(201).json({ msg: "Task updated successfully", taskAll})
+        }
+        else if (user.role == "member") { 
+            taskAll = await Task.find({ staffId })
+            return res.status(201).json({ msg: "Task updated successfully", taskAll})
+        }
+        else { 
+            return res.status(403).json({ msg: "Access denied" }) 
+        }
+         
     }catch(error){
         console.log("Error on updating task", error.message)
         res.status(400).json({ msg: "Error on updating task" })
@@ -77,7 +115,7 @@ export async function taskDeleteByIdCtrl (req, res) {
         const decoded = jwt.verify(token, process.env.JWT_SECRET)
         const user = await User.findById(decoded.id)
 
-        if (user.role !== "admin") return res.status(401).json({ msg:"Access Denied" })
+        if (user.role !== "admin" && user.role !== "member") return res.status(401).json({ msg:"Access Denied" })
 
         const result = await Task.deleteOne({ _id:id })
         

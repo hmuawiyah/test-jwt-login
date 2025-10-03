@@ -7,6 +7,11 @@ export const getTask = (token) => {
     headers: { Authorization: `Bearer ${token}` }
   })
 }
+export const getTaskByid = (token, id) => {
+  return axios.get(`${API_URL}/${id}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  })
+}
 
 export const postTask = (token, updatedData) => {
   return axios.post(`${API_URL}/`, updatedData, {
