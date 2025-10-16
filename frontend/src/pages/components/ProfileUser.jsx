@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { getUser } from '../services/authService'
+import { getUser } from '../../services/authService'
 import { useNavigate } from 'react-router-dom'
 
 export default function ProfileUser() {

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { getUser } from '../services/authService'
-import ProfileUser from './ProfileUser'
-import EditUser from './EditUser'
-import EditTaskAdmin from './EditTaskAdmin'
-import EditTaskMember from './EditTaskMember'
+import ProfileUser from './components/ProfileUser'
+import EditUser from './components/EditUser'
+import EditTaskAdmin from './components/EditTaskAdmin'
+import EditTaskMember from './components/EditTaskMember'
 import { useNavigate } from 'react-router-dom'
 
 export default function Profile() {
@@ -44,8 +44,6 @@ export default function Profile() {
       {showListUser && (<div>
       <EditUser />
       
-      <br />
-      <hr />
 
       <EditTaskAdmin />
       </div>)}

@@ -17,8 +17,6 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
 }))
 
-
-
 app.use("/api/user", userRoutes)
 app.use("/api/task", taskRoutes)
 

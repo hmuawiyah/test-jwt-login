@@ -45,12 +45,9 @@ export async function loginCtrl (req, res) {
 }
 
 export async function profileCtrl (req, res) {
-    const token = req.headers.authorization?.split(" ")[1]
-    if (!token) return res.status(401).json({ msg:"No token" })
+    const user = req.user
     
     try{
-        const decoded = jwt.verify(token, process.env.JWT_SECRET)
-        const user = await User.findById(decoded.id)
         const userAll = await User.find()
 
         res.json({user, userAll})
@@ -64,14 +61,9 @@ export async function updateByIdCtrl(req, res){
     const { id } = req.params
     const { email, password, role } = req.body
     const updateData = { email, role }
-
-    const token = req.headers.authorization?.split(" ")[1]
-    if (!token) return res.status(401).json({ msg:"No token" })
+    const user = req.user
     
     try{
-        const decoded = jwt.verify(token, process.env.JWT_SECRET)
-        const user = await User.findById(decoded.id)
-
         if (user.role !== "admin") return res.status(401).json({ msg:"Access Denied" })
         if (password && password.trim() !== '') {
             const hashedPassword = await bcrypt.hash(password, 10)
@@ -89,13 +81,9 @@ export async function updateByIdCtrl(req, res){
 
 export async function deleteByIdCtrl(req, res){
     const { id } = req.params
-    const token = req.headers.authorization?.split(" ")[1]
-    if (!token) return res.status(401).json({ msg:"No token" })
-   
-    try{
-        const decoded = jwt.verify(token, process.env.JWT_SECRET)
-        const user = await User.findById(decoded.id)
+    const user = req.user
 
+    try{
         if (user.role !== "admin") return res.status(401).json({ msg:"Access Denied" })
         
         const result = await User.deleteOne({ _id:id })

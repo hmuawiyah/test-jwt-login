@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import { getUser } from '../services/authService'
-import { getTask, postTask, updateTaskById, deleteTaskById } from '../services/taskService'
+import { getUser } from '../../services/authService'
+import { getTask, getTaskByid, postTask, updateTaskById, deleteTaskById } from '../../services/taskService'
 import { useNavigate } from 'react-router-dom'
 
-export default function EditTaskAdmin() {
+export default function EditTaskMember() {
   const [user, setUser] = useState(null)
   const [userAll, setUserAll] = useState(null)
   const [taskAll, setTaskAll] = useState(null)
@@ -19,7 +19,7 @@ export default function EditTaskAdmin() {
   const [taskId, setTaskId] = useState("")
   const [taskTitle, setTaskTitle] = useState("")
   const [taskDescription, setTaskDescription] = useState("")
-  const [taskStaffId, setTaskStaffId] = useState("")
+  // const [taskStaffId, setTaskStaffId] = useState("")
   const [taskStatus, setTaskStatus] = useState("")
 
   useEffect(() => {
@@ -31,17 +31,15 @@ export default function EditTaskAdmin() {
 
     getUser(token)
       .then(res => {
-        setUser(res.data.user)
-        setUserAll(res.data.userAll)})
-      .catch(() => {
-        localStorage.removeItem('token')
-        navigate('/login')
+        const fetchedUser = res.data.user
+        setUser(fetchedUser)
+        // setUserAll(res.data.userAll)
+        console.log({fetchedUser})
+        return getTaskByid(token, fetchedUser._id)
       })
-
-    getTask(token)
       .then(res => {
         setTaskAll(res.data.taskAll)
-        })
+      })
       .catch(() => {
         localStorage.removeItem('token')
         navigate('/login')
@@ -51,7 +49,7 @@ export default function EditTaskAdmin() {
 
   // --------------------------------------------------- TASK
 
-  const handleRegisterTask = async (e) => {
+  const handleRegisterTask = async (e, title, description, staffId, status) => {
     e.preventDefault()
     const token = localStorage.getItem('token')
     const updatedData = {
@@ -68,11 +66,11 @@ export default function EditTaskAdmin() {
 
       setTitle("")
       setDescription("")
-      setStaffId("")
+      // setStaffId("")
       setStatus("")
 
     } catch (err) {
-      alert("Email telah digunakan")
+      alert(JSON.stringify(updatedData))
       console.log(err.message)
     }
   }
@@ -87,6 +85,8 @@ export default function EditTaskAdmin() {
       status
     }
 
+    alert(JSON.stringify(updatedData))
+
     if (!token) {
       navigate('/login')
       return
@@ -98,7 +98,7 @@ export default function EditTaskAdmin() {
 
       setTitle("")
       setDescription("")
-      setStaffId("")
+      // setStaffId("")
       setStatus("")
 
     } catch (err) {
@@ -118,15 +118,15 @@ export default function EditTaskAdmin() {
       await deleteTaskById(token, id)
       setTaskAll(prev => prev.filter(user => user._id !== id))
     } catch (err) {
-      console.error('Failed to delete task:', err)
+      console.error('Failed to delete task:', err.message)
     }
   }
 
-  const formTaskUpdate = (id, title, description, staffId, status) => {
+  const formTaskUpdate = (id, title, description, status) => {
     setTaskId(id)
     setTaskTitle(title)
     setTaskDescription(description)
-    setTaskStaffId(staffId)
+    // setTaskStaffId(staffId)
     setTaskStatus(status)
   }
 
@@ -136,18 +136,11 @@ export default function EditTaskAdmin() {
   // --------------------------------------------------- PROFILE
     <div>
 {/* --------------------------------------------------- CREATE TASK */}
-      {user.role == "admin" && (<form onSubmit={(e) => handleRegisterTask(e, title, description, staffId, status)}>
+      {user.role == "member" && (<form onSubmit={(e) => handleRegisterTask(e, title, description, user._id, status)}>
         <h2>New Task Form</h2>
+        <h2>{user._id}</h2>
         <input type="text" value={title} onChange={e => setTitle(e.target.value)} placeholder="Title" />
         <input type="text" value={description} onChange={e => setDescription(e.target.value)} placeholder="Description" />
-        <select value={staffId} onChange={e => setStaffId(e.target.value)}>
-          <option value="">-- Pilih Staff --</option>
-          {
-            userAll.map((val, i) => (
-              <option key={val._id} value={val._id}>{val.email}</option>
-            ))
-          }
-        </select>
         <select value={status} onChange={e => setStatus(e.target.value)}>
           <option value="">-- Pilih Status --</option>
           <option value="pending">Pending</option>
@@ -161,11 +154,10 @@ export default function EditTaskAdmin() {
       <br />
 
 {/* --------------------------------------------------- UPDATE TASK */}
-      {showTaskForm && (<form onSubmit={(e) => handleUpdateTaskById(e, taskId, taskTitle, taskDescription, taskStaffId, taskStatus)}>
+      {showTaskForm && (<form onSubmit={(e) => handleUpdateTaskById(e, taskId, taskTitle, taskDescription, user._id, taskStatus)}>
         <h2>Update Task Form <button type="button" onClick={() => setShowTaskForm(false)}>X</button></h2>
         <input type="text" value={taskTitle} onChange={e => setTaskTitle(e.target.value)} placeholder="Title" />
         <input type="text" value={taskDescription} onChange={e => setTaskDescription(e.target.value)} placeholder="Description" />
-        <input type="text" value={taskStaffId} onChange={e => setTaskStaffId(e.target.value)} placeholder="Staff ID" />
         <select value={taskStatus} onChange={e => setTaskStatus(e.target.value)}>
           <option value="">-- Pilih Status --</option>
           <option value="pending">Pending</option>
@@ -180,12 +172,12 @@ export default function EditTaskAdmin() {
 
 {/* --------------------------------------------------- LIST TASK */}
       <ul>
-      {user.role == "admin" && taskAll.map((val, i) => (
+      {user.role == "member" && taskAll?.map((val, i) => (
         <li key={val._id || i}>
           {val._id} - {val.title} - staffId {val.staffId} - {val.status}
           <button onClick={() => {
             setShowTaskForm(true)
-            formTaskUpdate(val._id, val.title, val.description, val.staffId, val.status)
+            formTaskUpdate(val._id, val.title, val.description, val.status)
           }}>Update</button>
           <button onClick={(e) => handleDeleteTaskById(e, val._id)}>Delete</button>
         </li>

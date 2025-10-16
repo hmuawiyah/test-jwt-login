@@ -1,8 +1,9 @@
-import User from "../models/User.js"
 import Task from "../models/Task.js"
-import jwt from "jsonwebtoken"
+// import User from "../models/User.js"
+// import jwt from "jsonwebtoken"
 
 export async function taskGetCtrl (req, res) {
+
     try{
         const taskAll = await Task.find()
         res.status(200).json({ taskAll })
@@ -31,13 +32,9 @@ export async function taskGetByIdCtrl(req, res) {
 
 export async function taskPostCtrl (req, res){
     let { title, description, staffId, status } = req.body
-    const token = req.headers.authorization?.split(" ")[1]
-    if (!token) return res.status(401).json({ msg:"No token" })
+    const user = req.user
 
-    try{  
-        const decoded = jwt.verify(token, process.env.JWT_SECRET)
-        const user = await User.findById(decoded.id) 
-        
+    try{
         if (user.role !== "admin" && user.role !== "member") return res.status(401).json({ msg:"Access Denied" })
             
         const newTask = new Task({ title, description, staffId, status })
@@ -66,9 +63,7 @@ export async function taskPostCtrl (req, res){
 export async function taskUpdateByIdCtrl (req, res){ 
     let { id } = req.params
     let { title, description, staffId, status } = req.body
-
-    const token = req.headers.authorization?.split(" ")[1]
-    if (!token) return res.status(401).json({ msg:"No token" })
+    const user = req.user
 
     const updateData = {}
     title ? updateData.title = title : null
@@ -77,8 +72,6 @@ export async function taskUpdateByIdCtrl (req, res){
     status ? updateData.status = status : null
 
     try{
-        const decoded = jwt.verify(token, process.env.JWT_SECRET)
-        const user = await User.findById(decoded.id)
 
         if (user.role !== "admin" && user.role !== "member") return res.status(401).json({ msg:"Access Denied" })
 
@@ -106,14 +99,9 @@ export async function taskUpdateByIdCtrl (req, res){
 
 export async function taskDeleteByIdCtrl (req, res) {
     let { id } = req.params
-    // let { title, description, staffId, status } = req.body
-
-    const token = req.headers.authorization?.split(" ")[1]
-    if (!token) return res.status(401).json({ msg:"No token" })
+    const user = req.user
 
     try{
-        const decoded = jwt.verify(token, process.env.JWT_SECRET)
-        const user = await User.findById(decoded.id)
 
         if (user.role !== "admin" && user.role !== "member") return res.status(401).json({ msg:"Access Denied" })
 
