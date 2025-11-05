@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
 
 export async function registerCtrl (req, res) {
-    let { email, password, role } = req.body
+    let { userName, email, password, role } = req.body
     const userExists = await User.findOne({ email })
     try{
         if (userExists) return res.status(400).json({ msg: "User already exists" })
@@ -14,7 +14,7 @@ export async function registerCtrl (req, res) {
         if (!role){ role = "member" }
         if (role !== "admin" && role !== "member" ){ return res.status(400).json({ msg: "Failed to register user" }) }
         
-        const newUser = new User({ email, password: hashedPassword, role })
+        const newUser = new User({ userName, email, password: hashedPassword, role })
         await newUser.save()
 
         const userAll = await User.find()
@@ -48,7 +48,7 @@ export async function profileCtrl (req, res) {
     const user = req.user
     
     try{
-        const userAll = await User.find()
+        const userAll = await User.find().select("-password")
 
         res.json({user, userAll})
 
@@ -59,13 +59,17 @@ export async function profileCtrl (req, res) {
 
 export async function updateByIdCtrl(req, res){
     const { id } = req.params
-    const { email, password, role } = req.body
-    const updateData = { email, role }
+    const { userName, email, password, role } = req.body
+    const updateData = {}
+    // const updateData = { name, email, role }
     const user = req.user
     
     try{
         if (user.role !== "admin") return res.status(401).json({ msg:"Access Denied" })
-        if (password && password.trim() !== '') {
+        if (userName) updateData.userName = userName
+        if (email) updateData.email = email
+        if (role) updateData.role = role
+        if (password) {
             const hashedPassword = await bcrypt.hash(password, 10)
             updateData.password = hashedPassword
         }

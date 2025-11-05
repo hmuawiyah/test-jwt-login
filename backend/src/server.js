@@ -12,7 +12,8 @@ const PORT = process.env.PORT || 5001
 
 app.use(express.json())
 app.use(cors({
-  origin: 'http://localhost:5173', // domain frontend kamu
+  // origin: 'http://localhost:5173',
+  origin: 'http://192.168.100.232:5173',
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }))
@@ -22,6 +23,7 @@ app.use("/api/task", taskRoutes)
 
 connectDB().then(() => {
   app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`)
+    console.log(`Server is running on http://192.168.100.232:${PORT}`)
+    // console.log(`Server is running on http://localhost:${PORT}`)
   })
 })

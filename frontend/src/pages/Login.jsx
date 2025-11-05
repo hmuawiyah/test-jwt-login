@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import { login } from '../services/authService'
 import { useNavigate, Link } from 'react-router-dom'
+import { login } from '../services/authService'
 import Navbar from './components/Navbar'
 
 export default function Login() {
@@ -16,7 +16,7 @@ export default function Login() {
       console.log("res.data.token: "+res.data.token)
       console.log("res.data: "+res.data)
       alert("Login berhasil!")
-      navigate('/profile')
+      navigate('/dashboard')
     } catch (err) {
       alert(`Error handle submit: ${err.message}, ${res.data}`)
     }
@@ -27,7 +27,7 @@ export default function Login() {
 
       <Navbar />
 
-      <div className="grid grid-cols-1 md:grid-cols-12 justify-center xl:justify-between m-12 lg:mt-10 mx-20 border-1 border-[#394040] rounded-2xl">
+      <div className="grid grid-cols-1 md:grid-cols-12 justify-center xl:justify-between m-12 lg:mt-10 mx-20 border-2 border-[#ebebdd] rounded-2xl">
 
         <div className="col-span-7 xl:col-span-8 hidden md:flex justify-center items-center">
           <div className="relative w-full h-[480px] bg-[url('https://images.unsplash.com/photo-1726796065425-475e3fb7c12a')] bg-center bg-cover rounded-l-2xl overflow-hidden">
@@ -43,19 +43,19 @@ export default function Login() {
           </div>
         </div>
 
-        <div className="col-span-5 xl:col-span-4 flex flex-col items-center justify-center p-5 mx-auto md:m-0">
+        <div className="col-span-5 xl:col-span-4 flex flex-col items-center justify-center rounded-2xl! bg-[#fafaf4] rounded-box p-5 mx-auto md:m-0">
           <form onSubmit={handleSubmit}>
-          <fieldset className="fieldset rounded-2xl! rounded-box w-auto p-4 py-5">
-            {/* <legend className="fieldset-legend text-white">Login</legend> */}
+            <fieldset className="fieldset w-auto p-4 py-5">
+              <legend className="fieldset-legend font-semibold text-3xl text-[#394040]">Sign In to Your Account</legend>
 
-            <label className="label font-semibold">Email</label>
-            <input type="email" className="input" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
+              <label className="label font-semibold">Email</label>
+              <input type="email" className="input" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
 
-            <label className="label font-semibold">Password</label>
-            <input type="password" className="input" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} />
- 
-            <button className="btn bg-[#f8f34c] border-none shadow-none mt-4" type="submit">Login</button>
-          </fieldset>
+              <label className="label font-semibold">Password</label>
+              <input type="password" className="input" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} />
+  
+              <button className="btn bg-[#f8f34c] border-none shadow-none mt-4" type="submit">Login</button>
+            </fieldset>
           </form>
           <br />
 

@@ -34,7 +34,7 @@ export default function EditTaskMember() {
         const fetchedUser = res.data.user
         setUser(fetchedUser)
         // setUserAll(res.data.userAll)
-        console.log({fetchedUser})
+        // console.log({fetchedUser})
         return getTaskByid(token, fetchedUser._id)
       })
       .then(res => {

@@ -1,11 +1,12 @@
 import Task from "../models/Task.js"
 // import User from "../models/User.js"
 // import jwt from "jsonwebtoken"
-
+ 
 export async function taskGetCtrl (req, res) {
 
     try{
         const taskAll = await Task.find()
+        // console.log({taskAll})
         res.status(200).json({ taskAll })
     }catch(error){
         console.log("Error on getting task", error.message)
@@ -31,13 +32,13 @@ export async function taskGetByIdCtrl(req, res) {
 
 
 export async function taskPostCtrl (req, res){
-    let { title, description, staffId, status } = req.body
+    let { title, description, assignedBy, staffId, status, level } = req.body
     const user = req.user
 
     try{
         if (user.role !== "admin" && user.role !== "member") return res.status(401).json({ msg:"Access Denied" })
             
-        const newTask = new Task({ title, description, staffId, status })
+        const newTask = new Task({ title, description, assignedBy, staffId, status, level })
         await newTask.save()
 
         let taskAll
@@ -62,7 +63,7 @@ export async function taskPostCtrl (req, res){
 
 export async function taskUpdateByIdCtrl (req, res){ 
     let { id } = req.params
-    let { title, description, staffId, status } = req.body
+    let { title, description, staffId, status, level } = req.body
     const user = req.user
 
     const updateData = {}
@@ -70,6 +71,7 @@ export async function taskUpdateByIdCtrl (req, res){
     description ? updateData.description = description : null
     staffId ? updateData.staffId = staffId : null
     status ? updateData.status = status : null
+    level ? updateData.level = level : null
 
     try{
 
