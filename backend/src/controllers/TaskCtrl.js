@@ -6,8 +6,8 @@ export async function taskGetCtrl (req, res) {
 
     try{
         const taskAll = await Task.find()
-        // console.log({taskAll})
         res.status(200).json({ taskAll })
+        console.log("Task fetched:", taskAll.length)
     }catch(error){
         console.log("Error on getting task", error.message)
         res.status(400).json({ msg: "Error on getting task" })
@@ -37,6 +37,16 @@ export async function taskPostCtrl (req, res){
 
     try{
         if (user.role !== "admin" && user.role !== "member") return res.status(401).json({ msg:"Access Denied" })
+        
+        // if (user.role === "admin") {
+        //     if (!staffId) {
+        //         return res.status(400).json({ msg: "Staff ID is required for admin" })
+        //     }
+        //     assignedBy = user._id
+        // } else if (user.role === "member") {
+        //     assignedBy = user._id
+        //     staffId = user._id   // 💥 di sini kita isi otomatis staffId dengan id user sendiri
+        // }
             
         const newTask = new Task({ title, description, assignedBy, staffId, status, level })
         await newTask.save()

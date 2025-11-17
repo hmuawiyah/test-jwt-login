@@ -5,14 +5,14 @@ import { getTask, postTask, updateTaskById, deleteTaskById } from '../../service
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTrashCan, faPenToSquare, faUser } from '@fortawesome/free-regular-svg-icons'
-import { faMagnifyingGlass, faCircleInfo, faPlus, faEllipsisVertical } from '@fortawesome/free-solid-svg-icons'
+import { faMagnifyingGlass, faCircleInfo, faPlus, faEllipsisVertical, faDatabase } from '@fortawesome/free-solid-svg-icons'
 
 import toast, { Toaster } from 'react-hot-toast'
 
-import useViewStore from "../../../store/store"
+import useStore from "../../../store/store"
 
 
-export default function EditTaskAdmin({ user, setUser, userAll, setUserAll, taskAll, setTaskAll }) {
+export default function EditTask({ user, setUser, userAll, setUserAll, taskAll, setTaskAll }) {
   
   const [showTaskForm, setShowTaskForm] = useState(false)
   const navigate = useNavigate()
@@ -33,10 +33,10 @@ export default function EditTaskAdmin({ user, setUser, userAll, setUserAll, task
   const [filterStatus, setFilterStatus] = useState("All")
   const listStatus = ["All", "Pending", "In progress", "Completed"]
 
-  const { view, setView } = useViewStore()
+  const { view, setView } = useStore()
 
-  const successNotif = (action) => toast.success(`Success ${action} a new task!`)
-  const failNotif = () => toast('Failed to create a new task!', { icon: <FontAwesomeIcon className="text-[#00bafe]" icon={faCircleInfo} /> })
+  const successNotif = (action) => toast.success(`Success ${action} a new task!`, {duration: 5000,})
+  const failNotif = (action) => toast(`Failed to ${action} a new task`, { icon: <FontAwesomeIcon className="text-[#00bafe]" icon={faCircleInfo} />, duration: 5000})
 
   useEffect(() => {
     const token = localStorage.getItem('token')
@@ -47,7 +47,7 @@ export default function EditTaskAdmin({ user, setUser, userAll, setUserAll, task
       
   }, [navigate])
 
-  const handleRegisterTask = async (e) => {
+  const handleRegisterTask = async (e, title, description, staffId, status, level) => {
     e.preventDefault()
     const token = localStorage.getItem('token')
     const updatedData = {
@@ -71,8 +71,8 @@ export default function EditTaskAdmin({ user, setUser, userAll, setUserAll, task
       setLevel("")
 
     } catch (err) {
-      failNotif()
-      console.log(err.message)
+      failNotif("create")
+      console.log("Failed to register task" + err.message)
     }
   }
 
@@ -83,7 +83,7 @@ export default function EditTaskAdmin({ user, setUser, userAll, setUserAll, task
     const updatedData = {
       title,
       description,
-      assignedBy: user._id,
+      // assignedBy: user._id,
       staffId,
       status,
       level
@@ -166,15 +166,34 @@ export default function EditTaskAdmin({ user, setUser, userAll, setUserAll, task
     return text.length > limit ? text.slice(0, limit) + "..." : text;
   }
 
+  // --------------------------------------------------- RENDER EMPTY DATA (TABLE & GRID)
+  const RenderEmptyData = () => {
+    return(
+      <tbody>
+        <tr>
+          <td colSpan="5" className="flex flex-col justify-center items-center min-h-[250px] py-4">
+            <div className="flex justify-center items-center text-gray-600 text-3xl bg-gray-100 rounded-full w-15 h-15 "><FontAwesomeIcon icon={faDatabase} /></div>
+            <div className="font-semibold text-xl text-gray-800 mt-7">No Data Available</div>
+            <div className="text-sm text-gray-600">Please create a new task</div>
+          </td>
+        </tr>
+      </tbody>
+    )
+  }
+
 // --------------------------------------------------- RENDER LIST TASK (TABLE)
   const RenderTableTask = ({ filteredTaskAll }) => {
     return(
       <div className="w-full overflow-x-auto rounded-box border-2 border-[#ebebdd] bg-base-100 max-w-full">
         <table className="table w-full min-w-max">
+          {filteredTaskAll && filteredTaskAll.length > 0 ? (
+          <>
           <thead className="bg-[#f8f8f8]">
             <tr>
               <th>Name</th>
+              {user.role === "admin" && (
               <th>Staff's Name</th>
+              )}
               <th className="hidden md:table-cell">Status</th>
               <th className="hidden md:table-cell">Level</th>
               <th className="hidden md:table-cell">Date</th>
@@ -182,12 +201,13 @@ export default function EditTaskAdmin({ user, setUser, userAll, setUserAll, task
             </tr>
           </thead>
           <tbody>
-            {
-            filteredTaskAll && filteredTaskAll.length > 0 ? (
-              filteredTaskAll?.map((val, i) => (
+            
+              {filteredTaskAll?.map((val, i) => (
               <tr key={val._id}>
                   <td>{truncateText(val.title, 24)}</td>
+                  {user.role === "admin" && (
                   <td>{truncateText(val.staffId?.userName, 18)}</td>
+                  )}
                   <td className="hidden md:table-cell">
                     <span className={
                       val.status == "completed" ? "badge badge-soft badge-success" : 
@@ -236,15 +256,12 @@ export default function EditTaskAdmin({ user, setUser, userAll, setUserAll, task
                     }}><FontAwesomeIcon icon={faTrashCan} /></button>
                   </td>
               </tr>
-              ))
-            ):(
-              <tr>
-                <td colSpan="5" className="text-center py-4 text-gray-500">
-                  Please create a new task
-                </td>
-              </tr>
-            )}
+              ))}
           </tbody>
+          </>
+            ):(
+          <RenderEmptyData />
+            )}
         </table>
       </div>
     )
@@ -327,7 +344,9 @@ export default function EditTaskAdmin({ user, setUser, userAll, setUserAll, task
           </div>
           ))
         ):( 
-          <div></div> 
+          <div className="col-span-4 flex justify-center items-center border-2 border-[#ebebdd] bg-base-100 rounded-xl">
+            <RenderEmptyData />
+          </div>
         )
       }
       </div>
@@ -357,10 +376,14 @@ export default function EditTaskAdmin({ user, setUser, userAll, setUserAll, task
               />
             ))}
           </div>
+          
+          {user.role === "admin" && (
 
           <label className="input rounded-lg flex items-center w-auto ml-0 lg:ml-3 mt-3 lg:mt-0">
             <FontAwesomeIcon className="text-[#394040]" icon={faMagnifyingGlass} /> <input type="search" placeholder="Search by name..." onChange={e => setSearch(e.target.value)} />
           </label>
+          
+          )}
         </div>
 
         <div className="col-span-4 col-end-13 mt-5 lg:mt-0">
@@ -375,16 +398,23 @@ export default function EditTaskAdmin({ user, setUser, userAll, setUserAll, task
       <div className="modal" role="dialog">
         <div className="modal-box max-h-[90%] w-[95vw] md:w-[40vw] max-w-full sm:max-w-lg md:max-w-3xl overflow-x-auto">
         <h3 className="text-lg font-semibold">New Task Form</h3>
-        <hr className="my-5 h-[0.05rem] bg-gray-400 border-0" />
-        {user?.role == "admin" && (
+        <hr className="my-5 h-[0.05rem] bg-gray-400 border-0" /> 
+
             <form className="flex flex-col gap-3 flex-wrap w-full" onSubmit={(e) => {
-              handleRegisterTask(e, title, description, staffId, status, level)
+
+              user?.role === "admin"
+                    ? handleRegisterTask(e, title, description, staffId, status, level)
+                    : handleRegisterTask(e, title, description, user._id, status, level)
+              
               document.getElementById("modal_c_task").checked = false
+
             }}>
                 <label className="label text-sm">Title</label> 
                 <input className="input w-full" type="text" value={title} onChange={e => setTitle(e.target.value)} placeholder="Title" />
                 <label className="label text-sm">Description</label> 
                 <textarea className="textarea w-full" type="text" value={description} onChange={e => setDescription(e.target.value)} placeholder="Description" ></textarea>
+                {user?.role === "admin" && (
+                <>
                 <label className="label text-sm">Staff's Name</label> 
                 <select className="select w-full" value={staffId} onChange={e => setStaffId(e.target.value)}>
                   <option value="">-- Select Staff --</option>
@@ -394,6 +424,8 @@ export default function EditTaskAdmin({ user, setUser, userAll, setUserAll, task
                     ))
                   }
                 </select>
+                </>
+                )}
                 <label className="label text-sm">Status</label>
                 <select className="select w-full" value={status} onChange={e => setStatus(e.target.value)}>
                   <option value="">-- Select Status --</option>
@@ -410,8 +442,7 @@ export default function EditTaskAdmin({ user, setUser, userAll, setUserAll, task
                 </select>
 
                 <button className="btn rounded-lg w-full md:w-auto mt-5" type="submit">Create</button>
-            </form>
-        )}
+            </form> 
 
         <div className="modal-action">
           <label htmlFor="modal_c_task" className="btn rounded-lg">Close!</label>
@@ -520,6 +551,8 @@ export default function EditTaskAdmin({ user, setUser, userAll, setUserAll, task
             <input className="input w-full" type="text" value={title} onChange={e => setTitle(e.target.value)} placeholder="Title" />
             <label className="label text-sm">Description</label>
             <textarea className="textarea w-full" type="text" value={description} onChange={e => setDescription(e.target.value)} placeholder="Description"></textarea>
+            {user?.role === "admin" && (
+            <>
             <label className="label text-sm">Staff's Name</label>
             <select className="select w-full" value={staffId} onChange={e => setStaffId(e.target.value)}>
               <option value="">-- Select Staff --</option>
@@ -529,6 +562,8 @@ export default function EditTaskAdmin({ user, setUser, userAll, setUserAll, task
                 ))
               }
             </select>
+            </>
+            )}
             <label className="label text-sm">Status</label>
             <select className="select w-full" value={status} onChange={e => setStatus(e.target.value)}>
               <option value="">-- Select Status --</option>
@@ -575,25 +610,25 @@ export default function EditTaskAdmin({ user, setUser, userAll, setUserAll, task
 
 {/* --------------------------------------------------- LIST TASK */}
       <div className="col-span-12 w-full overflow-x-auto">
-      
+        
         { 
-          view == "table"
-          ? search !== "" 
-                  ? filterStatus.toLowerCase() == "all" 
-                      ? (<RenderTableTask filteredTaskAll={taskAll.filter(item => item.staffId.userName === search)} />)
-                      : (<RenderTableTask filteredTaskAll={taskAll.filter(item => item.status === filterStatus.toLowerCase() && item.staffId.userName === search)} />)
-                  : filterStatus.toLowerCase() == "all" 
-                      ? (<RenderTableTask filteredTaskAll={taskAll} />)
-                      : (<RenderTableTask filteredTaskAll={taskAll.filter(item => item.status === filterStatus.toLowerCase())} />)
-          
-          : search !== "" 
-                  ? filterStatus.toLowerCase() == "all" 
-                      ? (<RenderGridTask filteredTaskAll={taskAll.filter(item => item.staffId.userName === search)} />)
-                      : (<RenderGridTask filteredTaskAll={taskAll.filter(item => item.status === filterStatus.toLowerCase() && item.staffId.userName === search)} />)
-                  : filterStatus.toLowerCase() == "all" 
-                      ? (<RenderGridTask filteredTaskAll={taskAll} />)
-                      : (<RenderGridTask filteredTaskAll={taskAll.filter(item => item.status === filterStatus.toLowerCase())} />)
-          
+        view == "table"
+            ? search !== "" 
+                    ? filterStatus.toLowerCase() == "all"  //item.userName.toLowerCase().includes(search.toLowerCase())
+                        ? (<RenderTableTask filteredTaskAll={taskAll.filter( item => item.staffId.userName.toLowerCase().includes(search.toLowerCase()) )} />)
+                        : (<RenderTableTask filteredTaskAll={taskAll.filter( item => item.status === filterStatus.toLowerCase() && item.staffId.userName.toLowerCase().includes(search.toLowerCase()) )} />)
+                    : filterStatus.toLowerCase() == "all" 
+                        ? (<RenderTableTask filteredTaskAll={taskAll} />)
+                        : (<RenderTableTask filteredTaskAll={taskAll.filter( item => item.status === filterStatus.toLowerCase())} />)
+            
+            : search !== "" 
+                    ? filterStatus.toLowerCase() == "all" 
+                        ? (<RenderGridTask filteredTaskAll={taskAll.filter( item => item.staffId.userName.toLowerCase().includes(search.toLowerCase()) )} />)
+                        : (<RenderGridTask filteredTaskAll={taskAll.filter( item => item.status === filterStatus.toLowerCase() && item.staffId.userName.toLowerCase().includes(search.toLowerCase()) )} />)
+                    : filterStatus.toLowerCase() == "all" 
+                        ? (<RenderGridTask filteredTaskAll={taskAll} />)
+                        : (<RenderGridTask filteredTaskAll={taskAll.filter( item => item.status === filterStatus.toLowerCase())} />)
+              
         }
 
       </div>

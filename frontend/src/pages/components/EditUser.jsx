@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react'
-import { getUser, register, updateUserById, deleteUserById } from '../../services/authService'
+import { getUser, registerAdmin, updateUserById, deleteUserById } from '../../services/authService'
 import { useNavigate } from 'react-router-dom'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTrashCan, faPenToSquare, faUser, faEnvelope } from '@fortawesome/free-regular-svg-icons'
-import { faMagnifyingGlass, faPlus, faEllipsisVertical } from '@fortawesome/free-solid-svg-icons'
+import { faMagnifyingGlass, faPlus, faEllipsisVertical, faCircleInfo, faDatabase } from '@fortawesome/free-solid-svg-icons'
 
 import toast, { Toaster } from 'react-hot-toast'
 
-import useViewStore from "../../../store/store"
+import useStore from "../../../store/store"
 
 export default function EditUser({ userAll, setUserAll }) {
   const [user, setUser] = useState(null)
@@ -32,10 +32,10 @@ export default function EditUser({ userAll, setUserAll }) {
   const [filterRole, setFilterRole] = useState("All")
   const listRole = ["All" ,"Admin", "Member"]
 
-  const { view, setView } = useViewStore()
+  const { view, setView } = useStore()
 
-  const successNotif = (action) => toast.success(`Success ${action} a new user!`)
-  const failNotif = () => toast('Failed to create a new user!', { icon: <FontAwesomeIcon className="text-[#00bafe]" icon={faCircleInfo} /> })
+  const successNotif = (action) => toast.success(`Success ${action} a new user!`, {duration: 5000,})
+  const failNotif = (action) => toast(`Failed to ${action} a new user`, { icon: <FontAwesomeIcon className="text-[#00bafe]" icon={faCircleInfo} />, duration: 5000})
 
 
   useEffect(() => {
@@ -59,20 +59,28 @@ export default function EditUser({ userAll, setUserAll }) {
 
   // --------------------------------------------------- USER
 
-  const handleRegisterUser = async (e) => {
+  const handleRegisterUser = async (e, userName, email, password, role) => {
     e.preventDefault()
+    const token = localStorage.getItem('token')
+    const registerData = {
+      userName, 
+      email, 
+      password, 
+      role
+    }
+
     try {
-      const result = await register(userName, email, password, role)
-      successNotif("create")
+      const result = await registerAdmin(token, registerData)
+      successNotif("create") 
       setUserAll(result.data.userAll)
 
       setUserName("")
       setEmail("")
-      setPassword("")
+      setPassword("") 
       setRole("")
 
     } catch (err) {
-      failNotif()
+      failNotif("create")
       console.log(err.message)
     }
   }
@@ -167,71 +175,84 @@ export default function EditUser({ userAll, setUserAll }) {
 
   // if (!user) return <div>Loading...</div>
 
+// --------------------------------------------------- RENDER EMPTY DATA (TABLE & GRID)
+const RenderEmptyData = () => {
+  return(
+    <tbody>
+      <tr>
+        <td colSpan="5" className="flex flex-col justify-center items-center min-h-[250px] py-4">
+          <div className="flex justify-center items-center text-gray-600 text-3xl bg-gray-100 rounded-full w-15 h-15 "><FontAwesomeIcon icon={faDatabase} /></div>
+          <div className="font-semibold text-xl text-gray-800 mt-7">No Data Available</div>
+          <div className="text-sm text-gray-600">Please create a new user</div>
+        </td>
+      </tr>
+    </tbody>
+  )
+}
+
 // --------------------------------------------------- RENDER LIST USER (TABLE)
   const RenderTableUser = ({ filteredUserAll }) => {
     return(
     <div className="w-full overflow-x-auto rounded-box border-2 border-[#ebebdd] bg-base-100 max-w-full">
       <table className="table w-full min-w-max">
-        <thead className="bg-[#f8f8f8]">
-          <tr>
-            <th className="hidden md:table-cell">User ID</th>
-            <th>Name</th>
-            <th className="hidden md:table-cell">Email</th>
-            <th>Role</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredUserAll && filteredUserAll.length > 0 ? (
-            filteredUserAll.map((val, i) => (
-            <tr key={val._id}>
-                <td className="hidden md:table-cell">{val._id}</td>
-                <td>{truncateText(val.userName, 18)}</td>
-                <td className="hidden md:table-cell">{truncateText(val.email, 18)}</td>
-                <td>
-                  <span className={
-                    val.role == "admin" ? "badge bg-[#bde9ff] text-[#1291cf]" :
-                    "badge bg-[#fef8c8] text-[#877800]"
-                  }>
-                  {val.role}
-                  </span>
-                </td>
-                <td className="flex justify-center gap-2">
+        {filteredUserAll && filteredUserAll.length > 0 ? (
+          <>
+            <thead className="bg-[#f8f8f8]">
+              <tr>
+                <th className="hidden md:table-cell">User ID</th>
+                <th>Name</th>
+                <th className="hidden md:table-cell">Email</th>
+                <th>Role</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredUserAll.map((val, i) => (
+                <tr key={val._id}>
+                  <td className="hidden md:table-cell">{val._id}</td>
+                  <td>{truncateText(val.userName, 18)}</td>
+                  <td className="hidden md:table-cell">{truncateText(val.email, 18)}</td>
+                  <td>
+                    <span className={
+                      val.role == "admin" ? "badge bg-[#bde9ff] text-[#1291cf]" :
+                      "badge bg-[#fef8c8] text-[#877800]"
+                    }>
+                      {val.role}
+                    </span>
+                  </td>
+                  <td className="flex justify-center gap-2">
 
-                  <button className="btn btn-soft btn-info btn-sm rounded-lg" onClick={() => {
-                    tempValues({
-                      id:val._id, userName:val.userName, email:val.email, role:val.role,
-                      createdAt:val.createdAt, updatedAt:val.updatedAt})
-                    setTimeout(() => {
-                      document.getElementById("modal_user_detail").checked = true
-                    }, 0)
-                  }}><FontAwesomeIcon icon={faMagnifyingGlass} /></button>
-                  <button className="btn font-medium btn-sm rounded-lg" onClick={() => {
-                    tempValues({
-                      id:val._id, userName:val.userName, email:val.email, role:val.role})
-                    setTimeout(() => {
-                      document.getElementById("modal_u_user").checked = true
-                    }, 0)
-                  }}>Update</button>
-                  <button className="btn btn-soft btn-error btn-sm rounded-lg" onClick={(e) => {
-                    tempValues({
-                        id:val._id
-                    })
-                    setTimeout(() => {
-                        document.getElementById("modal_d_user").checked = true
-                    }, 0)
-                  }}><FontAwesomeIcon icon={faTrashCan} /></button>
-                </td>
-            </tr>
-            ))
-          ):(
-            <tr>
-              <td colSpan="5" className="text-center py-4 text-gray-500">
-                Please create a new user
-              </td>
-            </tr>
-          )}
-        </tbody>
+                    <button className="btn btn-soft btn-info btn-sm rounded-lg" onClick={() => {
+                      tempValues({
+                        id:val._id, userName:val.userName, email:val.email, role:val.role,
+                        createdAt:val.createdAt, updatedAt:val.updatedAt})
+                      setTimeout(() => {
+                        document.getElementById("modal_user_detail").checked = true
+                      }, 0)
+                    }}><FontAwesomeIcon icon={faMagnifyingGlass} /></button>
+                    <button className="btn font-medium btn-sm rounded-lg" onClick={() => {
+                      tempValues({
+                        id:val._id, userName:val.userName, email:val.email, role:val.role})
+                      setTimeout(() => {
+                        document.getElementById("modal_u_user").checked = true
+                      }, 0)
+                    }}>Update</button>
+                    <button className="btn btn-soft btn-error btn-sm rounded-lg" onClick={(e) => {
+                      tempValues({
+                          id:val._id
+                      })
+                      setTimeout(() => {
+                          document.getElementById("modal_d_user").checked = true
+                      }, 0)
+                    }}><FontAwesomeIcon icon={faTrashCan} /></button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </>
+        ) : (
+          <RenderEmptyData />
+        )}
       </table>
     </div>
     )
@@ -248,16 +269,16 @@ export default function EditUser({ userAll, setUserAll }) {
           <div className="card rounded-xl border-2 border-[#ebebdd] bg-base-100 card-md">
             <div className="card-body">
 
-              <div className="flex justify-between items-center font-medium text-lg leading-5 mb-4">
+              <div className="flex justify-between items-center font-medium text-lg leading-7 mb-5">
                 
                 <div className="flex items-center">
                   <div className="avatar avatar-placeholder">
-                    <div class="bg-gray-100 text-gray-600 w-10 text-md font-light rounded-full">
+                    <div className="bg-gray-100 text-gray-600 w-10 text-md font-light rounded-full">
                       <span>{getInitials(val.userName)}</span>
                     </div>
                   </div>
-                  <div className="flex flex-col ml-2">
-                    <span className=""> {truncateText(val.userName, 18)} </span>
+                  <div className="flex flex-col ml-2 -translate-y-[3px]">
+                    <span className="text-gray-600 font-normal"> {truncateText(val.userName, 18)} </span>
                     <span className="text-gray-400 text-xs"><FontAwesomeIcon icon={faEnvelope} /> {truncateText(val.email, 18)} </span>
                   </div>
                 </div>
@@ -309,7 +330,9 @@ export default function EditUser({ userAll, setUserAll }) {
           </div>
           ))
         ):( 
-          <div></div> 
+          <div className="col-span-3 flex justify-center items-center border-2 border-[#ebebdd] bg-base-100 rounded-xl">
+            <RenderEmptyData />
+          </div>
         )
       }
       </div>
@@ -358,7 +381,7 @@ export default function EditUser({ userAll, setUserAll }) {
           <div className="col-span-10 col-start-2">
             {user?.role == "admin" && (
               <form className="flex flex-col gap-3 flex-wrap w-full" onSubmit={(e) => {
-                handleRegisterUser(e)
+                handleRegisterUser(e, userName, email, password, userRole)
                 document.getElementById("modal_c_user").checked = false
               }}>
                 <label className="label text-sm">Name</label> 
@@ -370,11 +393,11 @@ export default function EditUser({ userAll, setUserAll }) {
                 <label className="label text-sm">Role</label> 
                 <select className="select w-full" value={userRole} onChange={e => setUserRole(e.target.value)}>
                   <option value="">-- Select Status --</option>
-                  <option value="admin"><span className="badge bg-[#bde9ff] text-[#1291cf] border-none">
-                          Admin</span>
+                  <option value="admin">
+                          Admin
                   </option>
-                  <option value="member"><span className="badge bg-[#fef8c8] text-[#877800] border-none">
-                          Member</span>
+                  <option value="member">
+                          Member
                   </option>
                 </select>
 
@@ -463,11 +486,11 @@ export default function EditUser({ userAll, setUserAll }) {
             <label className="label text-sm">Role</label>
             <select className="select w-full" value={userRole} onChange={e => setUserRole(e.target.value)}>
               <option value="">-- Select Status --</option>
-              <option value="admin"><span className="badge bg-[#bde9ff] text-[#1291cf] border-none">
-                      Admin</span>
+              <option value="admin">
+                      Admin
               </option>
-              <option value="member"><span className="badge bg-[#fef8c8] text-[#877800] border-none">
-                      Member</span>
+              <option value="member">
+                      Member
               </option>
             </select>
 
@@ -507,19 +530,19 @@ export default function EditUser({ userAll, setUserAll }) {
           view == "table"
           ? search !== "" 
                   ? filterRole.toLowerCase() == "all" 
-                      ? (<RenderTableUser filteredUserAll={userAll.filter(item => item.userName === search)} />)
-                      : (<RenderTableUser filteredUserAll={userAll.filter(item => item.role === filterRole.toLowerCase() && item.userName === search)} />)
+                      ? (<RenderTableUser filteredUserAll={userAll.filter( item => item.userName.toLowerCase().includes(search.toLowerCase()) )} />)
+                      : (<RenderTableUser filteredUserAll={userAll.filter( item => item.role === filterRole.toLowerCase() && item.userName.toLowerCase().includes(search.toLowerCase()) )} />)
                   : filterRole.toLowerCase() == "all" 
                       ? (<RenderTableUser filteredUserAll={userAll} />)
-                      : (<RenderTableUser filteredUserAll={userAll.filter(item => item.role === filterRole.toLowerCase())} />)
+                      : (<RenderTableUser filteredUserAll={userAll.filter( item => item.role === filterRole.toLowerCase() )} />)
           
           : search !== "" 
                   ? filterRole.toLowerCase() == "all" 
-                      ? (<RenderGridUser filteredUserAll={userAll.filter(item => item.userName === search)} />)
-                      : (<RenderGridUser filteredUserAll={userAll.filter(item => item.role === filterRole.toLowerCase() && item.userName === search)} />)
+                      ? (<RenderGridUser filteredUserAll={userAll.filter( item => item.userName.toLowerCase().includes(search.toLowerCase()) )} />)
+                      : (<RenderGridUser filteredUserAll={userAll.filter( item => item.role === filterRole.toLowerCase() && item.userName.toLowerCase().includes(search.toLowerCase()) )} />)
                   : filterRole.toLowerCase() == "all" 
                       ? (<RenderGridUser filteredUserAll={userAll} />)
-                      : (<RenderGridUser filteredUserAll={userAll.filter(item => item.role === filterRole.toLowerCase())} />)
+                      : (<RenderGridUser filteredUserAll={userAll.filter( item => item.role === filterRole.toLowerCase()) } />)
           
         }
 

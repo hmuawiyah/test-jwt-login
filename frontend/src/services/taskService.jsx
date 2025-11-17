@@ -1,7 +1,7 @@
 import axios from 'axios'
 
-// const API_URL = 'http://localhost:5001/api/task'
-const API_URL = 'http://192.168.100.232:5001/api/task'
+const API_URL = 'http://localhost:5001/api/task'
+// const API_URL = 'http://192.168.100.232:5001/api/task'
 
 export const getTask = (token) => {
   return axios.get(`${API_URL}/`, {

@@ -8,17 +8,22 @@ import Features from './components/Features';
 import GetStartedContent from './components/GetStartedContent';
 import Footer from './components/Footer';
 
+import useStore from "../../store/store"
+
 export default function Home() {
+
+    const { user } = useStore()
+
     return(
         <div className="px-4 sm:px-8 lg:px-20 xl:px-32">
 
-            <Navbar />
+            <Navbar user={user} />
 
             <Content />
             <Features />
             <GetStartedContent />
 
-            <hr className="text-gray-400 mt-50 mb-5" />
+            <hr className="text-gray-400 mt-40 mb-5" />
 
             <Footer />
             

@@ -7,13 +7,13 @@ const FeatureBox = ({ icon, title, desc }) => {
     return(
 
         <div className="col-span-4">
-        <div className="h-[35vh] md:h-[40vh] bg-[#fafaf4] border-2 border-[#ebebdd] rounded-2xl">
+        <div className="h-[28vh] md:h-[30vh] bg-[#fafaf4] border-2 border-[#ebebdd] rounded-2xl">
             
             <div className="absolute flex items-center justify-center bg-[#f8f34c] rounded-lg text-xl h-[7vh] w-[7vh] ml-4 mt-4 ">
                 {icon}
             </div>
             
-            <div className="flex flex-col justify-between h-[calc(100%-1rem)] w-[calc(100%-1rem)] pt-15 md:pt-18 pl-4">
+            <div className="flex flex-col justify-between h-[calc(100%-1rem)] w-[calc(100%-1rem)] pt-22 md:pt-22 pl-4">
                 <div className="font-medium text-2xl">
                     {title}
                 </div>

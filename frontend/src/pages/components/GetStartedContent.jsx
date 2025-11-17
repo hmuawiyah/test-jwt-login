@@ -9,7 +9,7 @@ export default function GetStartedContent () {
       
         <div className="col-span-12 grid grid-cols-1 lg:grid-cols-3 gap-4">
             <div className="col-span-2">
-                <p className="mb-4 text-lg font-medium uppercase tracking-[1px]">Simplify Work With TaskNest</p>
+                <p className="mb-4 text-lg font-medium uppercase tracking-[1px] opacity-50">Simplify Work With TaskNest</p>
                 <h1 className="text-3xl lg:text-5xl md:leading-13 font-medium text-balance">Manage tasks easily, collaborate faster <br /> with TaskNest.</h1>
             </div>
             <div className="col-span-1 flex justify-start items-end mt-5">
@@ -29,7 +29,7 @@ export default function GetStartedContent () {
 
             </div>
         </div>
-        <div className="col-span-12 grid grid-cols-3 gap-4 mt-15 mx-3 lg:mx-0">
+        <div className="col-span-12 grid-cols-3 gap-4 mt-15 mx-3 lg:mx-0 hidden lg:grid">
             <div className="
             col-span-3 md:col-span-2 h-40 md:h-85 bg-center bg-cover rounded-2xl
             bg-[url(https://images.unsplash.com/photo-1726796065425-475e3fb7c12a)]

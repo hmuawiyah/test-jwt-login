@@ -6,36 +6,23 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faList, faTableCellsLarge, faTableList, faListCheck } from '@fortawesome/free-solid-svg-icons'
 import { faCircleCheck, faClock, faUser } from '@fortawesome/free-regular-svg-icons'
 
-import useViewStore from "../../../store/store"
+import useStore from "../../../store/store"
 
-export default function ProfileUser({ userAll, taskAll }) {
+export default function ProfileUser({ user, userAll, taskAll }) {
   
-  const [user, setUser] = useState(null)
   const navigate = useNavigate()
 
-  const { view, setView, content, setContent } = useViewStore()
+  const { view, setView, content, setContent } = useStore()
 
   useEffect(() => {
     const token = localStorage.getItem('token')
     if (!token) {
       navigate('/login')
       return
-    }
-
-    getUser(token)
-      .then(res => {
-          setUser(res.data.user)
-      })
-      .catch(() => {
-          localStorage.removeItem('token')
-          navigate('/login')
-      })
+    } 
+    
+      
   }, [])
-
-  const handleLogout = () => {
-    localStorage.removeItem('token')
-    navigate('/login')
-  }
 
   const getTodayDate = () => {
     const today = new Date()
@@ -64,13 +51,13 @@ export default function ProfileUser({ userAll, taskAll }) {
     )
   }
   
-  const BadgeRole = (role) => {
+  const BadgeRole = (user) => {
     return (
       <>
-        {role.role === "admin" ? (
-          <span className="badge badge-xl bg-[#bde9ff] text-[#1291cf]">admin</span>
+        {user.role === "admin" ? (
+          <span className="badge badge-xl bg-[#bde9ff] text-[#1291cf] border-none">admin</span>
         ) : (
-          <span className="badge badge-xl bg-[#fef8c8] text-[#877800]">member</span>
+          <span className="badge badge-xl bg-[#fef8c8] text-[#877800] border-none">member</span>
         )}
       </>
     )
@@ -86,7 +73,7 @@ export default function ProfileUser({ userAll, taskAll }) {
         </div>
        
 {/* --------------------------------------------------- TOGGLE VIEW */}
-        <div className="col-span-12 flex justify-end">
+        <div className="col-span-12 flex justify-end my-5">
 
           <div className="col-span-4 tabs tabs-box p-2 font-medium [&_label]:cursor-pointer">
 
@@ -116,49 +103,61 @@ export default function ProfileUser({ userAll, taskAll }) {
           
         </div>
 
-{/* --------------------------------------------------- TOGGLE VIEW */}      
-        <div className="col-span-12 grid grid-cols-2 md:grid-cols-4 gap-4">
-          <StateBox title={"Total tasks"} value={taskAll?.length} icon={<FontAwesomeIcon icon={faList} />} textColor="text-[#394040]" bgColor="bg-[#f8f8f8]" />
-          <StateBox title={"In Progress"} value={taskAll?.filter(item => item.status === "in progress").length} icon={<FontAwesomeIcon icon={faClock} />} textColor="text-[#fcb700]" bgColor="bg-[#fffaf0]" />
-          <StateBox title={"Completed"} value={taskAll?.filter(item => item.status === "completed").length} icon={<FontAwesomeIcon icon={faCircleCheck} />} textColor="text-[#00d390]" bgColor="bg-[#f1fcf6]" />
-          <StateBox title={"Team Members"} value={userAll?.length} icon={<FontAwesomeIcon icon={faUser} />} textColor="text-[#394040]" bgColor="bg-[#f8f8f8]" />
-        </div>
+{/* --------------------------------------------------- STATS */}  
+        {
+        user.role === "admin" 
+            ? <div className="col-span-12 grid grid-cols-2 md:grid-cols-4 gap-4">
+                <StateBox title={"Total tasks"} value={taskAll?.length} icon={<FontAwesomeIcon icon={faList} />} textColor="text-[#394040]" bgColor="bg-[#f8f8f8]" />
+                <StateBox title={"In Progress"} value={taskAll?.filter(item => item.status === "in progress").length} icon={<FontAwesomeIcon icon={faClock} />} textColor="text-[#fcb700]" bgColor="bg-[#fffaf0]" />
+                <StateBox title={"Completed"} value={taskAll?.filter(item => item.status === "completed").length} icon={<FontAwesomeIcon icon={faCircleCheck} />} textColor="text-[#00d390]" bgColor="bg-[#f1fcf6]" />
+                <StateBox title={"Team Members"} value={userAll?.length} icon={<FontAwesomeIcon icon={faUser} />} textColor="text-[#394040]" bgColor="bg-[#f8f8f8]" />
+              </div>
+            : <div className="col-span-12 grid grid-cols-2 md:grid-cols-4 gap-4">
+                <StateBox title={"Total tasks"} value={taskAll?.filter(item => item.staffId.userName === user.userName).length} icon={<FontAwesomeIcon icon={faList} />} textColor="text-[#394040]" bgColor="bg-[#f8f8f8]" />
+                <StateBox title={"In Progress"} value={taskAll?.filter(item => item.status === "in progress" && item.staffId.userName === user.userName).length} icon={<FontAwesomeIcon icon={faClock} />} textColor="text-[#fcb700]" bgColor="bg-[#fffaf0]" />
+                <StateBox title={"Completed"} value={taskAll?.filter(item => item.status === "completed" && item.staffId.userName === user.userName).length} icon={<FontAwesomeIcon icon={faCircleCheck} />} textColor="text-[#00d390]" bgColor="bg-[#f1fcf6]" />
+                <StateBox title={"Team Members"} value={userAll?.length} icon={<FontAwesomeIcon icon={faUser} />} textColor="text-[#394040]" bgColor="bg-[#f8f8f8]" />
+              </div>
+        }
 
 {/* --------------------------------------------------- HR */} 
         <div className="col-span-12">
             <hr className="my-1 h-[0.1rem] bg-[#ddddd1] border-0" />
         </div>
 
-{/* --------------------------------------------------- TOGGLE CONTENT */}          
-        <div className="col-span-12 flex justify-center mt-10 mb-6">
+{/* --------------------------------------------------- TOGGLE CONTENT */}  
+        {
+        user.role === "admin" && (        
+          <div className="col-span-12 flex justify-center mt-10 mb-6">
 
-            <div className="flex justify-center tabs tabs-box p-2 font-medium [&_label]:cursor-pointer">
+              <div className="flex justify-center tabs tabs-box p-2 font-medium [&_label]:cursor-pointer">
 
-              <input
-                type="radio" id="user" name="content" className="hidden peer/user"
-                checked={content === "user"} onChange={() => setContent("user")}
-              />
-              <label
-                htmlFor="user"
-                className="tab peer-checked/user:!bg-[#f8f34c] peer-checked/user:!text-[#394040] transition"
-              >
-                <FontAwesomeIcon icon={faUser} />
-                <span>User content</span>
-              </label>
+                <input
+                  type="radio" id="user" name="content" className="hidden peer/user"
+                  checked={content === "user"} onChange={() => setContent("user")}
+                />
+                <label
+                  htmlFor="user"
+                  className="tab peer-checked/user:!bg-[#f8f34c] peer-checked/user:!text-[#394040] transition"
+                >
+                  <FontAwesomeIcon icon={faUser} />
+                  <span>Team Members</span>
+                </label>
 
-              <input type="radio" id="task" name="content" className="hidden peer/task"
-                checked={content === "task"} onChange={() => setContent("task")}
-              />
-              <label
-                htmlFor="task"
-                className="tab peer-checked/task:!bg-[#f8f34c] peer-checked/task:!text-[#394040] transition"
-              >
-                <FontAwesomeIcon icon={faListCheck} />
-                <span>Task content</span>
-              </label>
-            </div>
+                <input type="radio" id="task" name="content" className="hidden peer/task"
+                  checked={content === "task"} onChange={() => setContent("task")}
+                />
+                <label
+                  htmlFor="task"
+                  className="tab peer-checked/task:!bg-[#f8f34c] peer-checked/task:!text-[#394040] transition"
+                >
+                  <FontAwesomeIcon icon={faListCheck} />
+                  <span>Tasks</span>
+                </label>
+              </div>
 
-        </div>
+          </div>
+        )}
 
         
 

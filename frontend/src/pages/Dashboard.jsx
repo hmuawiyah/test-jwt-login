@@ -6,24 +6,20 @@ import { getTask } from '../services/taskService'
 
 import ProfileUser from './components/ProfileUser'
 import EditUser from './components/EditUser'
-import EditTaskAdmin from './components/EditTaskAdmin'
-import EditTaskMember from './components/EditTaskMember'
+import EditTask from './components/EditTask'
 import Navbar from './components/Navbar'
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faTableCellsLarge, faTableList } from '@fortawesome/free-solid-svg-icons'
-import { faFolderOpen } from '@fortawesome/free-regular-svg-icons'
-
-import useViewStore from "../../store/store"
+import useStore from "../../store/store"
 
 export default function Profile() {
-  const [user, setUser] = useState(null)
-  const [userAll, setUserAll] = useState([])
-  const [taskAll, setTaskAll] = useState(null)
-
+  // const [user, setUser] = useState(null)
+  
   const navigate = useNavigate()
+  const { view, setView, content, setContent, user, setUser } = useStore()
 
-  const { view, setView, content, setContent } = useViewStore()
+  const [userAll, setUserAll] = useState([])
+  const [taskAll, setTaskAll] = useState([])
+  const [visibleTasks, setVisibleTasks] = useState([])
 
   useEffect(() => {
     const token = localStorage.getItem('token')
@@ -32,43 +28,68 @@ export default function Profile() {
       return
     }
 
-    getUser(token)
-      .then(res => {
-        setUser(res.data.user)
-        setUserAll(res.data.userAll)
+    Promise.all([getUser(token), getTask(token)])
+      .then(([userRes, taskRes]) => {
+        // console.log("userRes:", userRes.data)
+        // console.log("taskRes:", taskRes.data)
+        setUserAll(userRes.data.userAll || [])
+        setTaskAll(taskRes.data.taskAll || [])
+        // console.log(taskRes.data.taskAll)
       })
       .catch(() => {
+        // console.log("masuk catch")
         localStorage.removeItem('token')
         navigate('/login')
       })
 
-    getTask(token)
-      .then(res => {
-        setTaskAll(res.data.taskAll)
-        })
-      .catch(() => {
-        localStorage.removeItem('token')
-        navigate('/login')
-      })
-      
+    // getTask(token)
+    //   .then((res) => {
+    //     setTaskAll(res.data.taskAll)
+    //     // setTaskAll("res.data.taskAll")
+
+    //   }).catch(() => {
+    //     localStorage.removeItem('token')
+    //     navigate('/login')
+    //   })
   }, [navigate])
 
+  useEffect(() => {
+    if (!user || taskAll.length === 0) return
+
+    if (user.role === "member") {
+      setContent("task")
+      setVisibleTasks(taskAll.filter(item => item.staffId?.userName === user.userName))
+    } else {
+      setContent("user")
+      setVisibleTasks(taskAll)
+    }
+
+  }, [userAll, taskAll, setContent])
+
+
+
   if (!user) return <div></div>
+
+  { console.log(visibleTasks) }
 
   return (
 
     <div className="px-4 sm:px-8 lg:px-20 xl:px-32">
-      <Navbar />
+      {/* <p>taskAll</p> */}
+      {/* <p>{JSON.stringify(visibleTasks)}</p> */}
+      <p>{visibleTasks.length}</p>
+      {/* <p>{typeof taskAll}</p> */}
+      <Navbar user={user} />
+
 
 {/* --------------------------------------------------- PROFILE */}
-      <ProfileUser userAll={userAll} taskAll={taskAll} />
-
+      <ProfileUser user={user} userAll={userAll} taskAll={taskAll} />
 
 {/* --------------------------------------------------- USER / TASK */}
       {
-        content === "user" 
-            ? <EditUser userAll={userAll} setUserAll={setUserAll} />
-            : <EditTaskAdmin user={user} setUser={setUser} userAll={userAll} setUserAll={setUserAll} taskAll={taskAll} setTaskAll={setTaskAll} />
+      content === "user" 
+          ? <EditUser userAll={userAll} setUserAll={setUserAll} /> 
+          : <EditTask user={user} setUser={setUser} userAll={userAll} setUserAll={setUserAll} taskAll={visibleTasks} setTaskAll={setTaskAll} />
       }
       
       {/* <EditTaskMember /> */}

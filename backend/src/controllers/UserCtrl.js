@@ -5,21 +5,38 @@ import jwt from "jsonwebtoken"
 export async function registerCtrl (req, res) {
     let { userName, email, password, role } = req.body
     const userExists = await User.findOne({ email })
+
     try{
         if (userExists) return res.status(400).json({ msg: "User already exists" })
         if (!email || !password) { return res.status(400).json({ msg: "Email and password are required" }) }
-
+        
         const hashedPassword = await bcrypt.hash(password, 10)
 
-        if (!role){ role = "member" }
-        if (role !== "admin" && role !== "member" ){ return res.status(400).json({ msg: "Failed to register user" }) }
+        let finalRole = "member"
         
-        const newUser = new User({ userName, email, password: hashedPassword, role })
+        if (req.user && req.user.role == "admin"){ 
+            if ( role == "member" || role == "admin" ){
+                console.log({role})
+                finalRole = role
+                console.log({finalRole})
+            }else{
+                return res.status(400).json({ msg: "Failed to register user" })
+            }
+        }
+
+        if (!req.user || req.user.role !== "admin") {
+            finalRole = "member"
+            console.log("masuk if kedua")
+            console.log(req.user)
+        }
+        
+        const newUser = new User({ userName, email, password: hashedPassword, role:finalRole })
         await newUser.save()
 
         const userAll = await User.find()
              
         res.status(201).json({ msg: "User registered successfully", userAll })
+
     }catch(error){
         console.log("Error on /register", error.message)
         res.status(400).json({ msg: "Error" })
@@ -31,10 +48,10 @@ export async function loginCtrl (req, res) {
 
     try{
         const user = await User.findOne({ email })
-        if (!user) return res.status(400).json({ msg: "Invalid credentials" })
+        if (!user) return res.status(400).json({ msg: "Invalid credentials user" })
         
         const isMatch = await bcrypt.compare(password, user.password)
-        if (!isMatch) return res.status(400).json({ msg: "Invalid credentials" })
+        if (!isMatch) return res.status(400).json({ msg: "Invalid credentials pass" })
         
         const token = jwt.sign({ id: user._id}, process.env.JWT_SECRET, { expiresIn: "1d" })
         res.json({ token })
@@ -61,7 +78,6 @@ export async function updateByIdCtrl(req, res){
     const { id } = req.params
     const { userName, email, password, role } = req.body
     const updateData = {}
-    // const updateData = { name, email, role }
     const user = req.user
     
     try{
