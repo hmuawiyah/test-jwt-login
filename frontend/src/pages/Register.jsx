@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { registerPublic } from '../services/authService'
-import Navbar from './components/Navbar'
+import Navbar from '../components/Navbar'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCircleInfo } from '@fortawesome/free-solid-svg-icons'
@@ -28,7 +28,6 @@ export default function Register() {
   }
 
   const registerData = { userName, email, password, role: "member" }
-  console.log("Data dikirim:", registerData)
 
   try {
     const result = await registerPublic(registerData)
@@ -47,14 +46,14 @@ export default function Register() {
 
 
   return (
-    <div className="px-4 sm:px-8 lg:px-20 xl:px-32">
+    <div className="px-4 sm:px-8 lg:px-20 xl:px-32 pb-20">
 
       <Navbar />
 
       <div className="grid grid-cols-1 md:grid-cols-12 justify-center xl:justify-between m-12 lg:mt-10 min-h-[580px] mx-auto border-2 border-[#ebebdd] rounded-2xl">
 
         <div className="col-span-7 xl:col-span-8 hidden md:flex justify-center items-center">
-          <div className="relative w-full h-full bg-[url('https://images.unsplash.com/photo-1726796065425-475e3fb7c12a')] bg-center bg-cover rounded-l-2xl overflow-hidden">
+          <div className="relative w-full h-full bg-[url('https://images.unsplash.com/photo-1709715357549-f2d587846ee1?w=1000&q=80&auto=format')] bg-center bg-cover rounded-l-2xl overflow-hidden">
         
             {/* Overlay gelap */}
             <div className="absolute inset-0 bg-black/50 z-10" />

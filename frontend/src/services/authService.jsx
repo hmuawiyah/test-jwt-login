@@ -22,7 +22,13 @@ export const login = (email, password) => {
 }
 
 export const getUser = (token) => {
-  return axios.get(`${API_URL}/profile`, {
+  return axios.get(`${API_URL}/user`, {
+    headers: { Authorization: `Bearer ${token}` }
+  })
+}
+
+export const getUserAll = (token) => {
+  return axios.get(`${API_URL}/userAll`, {
     headers: { Authorization: `Bearer ${token}` }
   })
 }

@@ -1,14 +1,16 @@
 import React, { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faRightToBracket } from '@fortawesome/free-solid-svg-icons';
-import Navbar from './components/Navbar'
-import Content from './components/Content';
-import Features from './components/Features';
-import GetStartedContent from './components/GetStartedContent';
-import Footer from './components/Footer';
 
-import useStore from "../../store/store"
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faRightToBracket } from '@fortawesome/free-solid-svg-icons'
+
+import Navbar from '../components/Navbar'
+import Content from '../components/Content'
+import Features from '../components/Features'
+import GetToKnow from '../components/GetToKnow'
+import Footer from '../components/Footer'
+
+import useStore from "../store/store"
 
 export default function Home() {
 
@@ -21,7 +23,7 @@ export default function Home() {
 
             <Content />
             <Features />
-            <GetStartedContent />
+            <GetToKnow />
 
             <hr className="text-gray-400 mt-40 mb-5" />
 

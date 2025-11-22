@@ -3,17 +3,16 @@ import Task from "../models/Task.js"
 // import jwt from "jsonwebtoken"
  
 export async function taskGetCtrl (req, res) {
-
-    try{
+ 
+    try{ 
         const taskAll = await Task.find()
         res.status(200).json({ taskAll })
-        console.log("Task fetched:", taskAll.length)
     }catch(error){
         console.log("Error on getting task", error.message)
         res.status(400).json({ msg: "Error on getting task" })
     }
 }
-
+ 
 export async function taskGetByIdCtrl(req, res) {
   try {
     const { id } = req.params 

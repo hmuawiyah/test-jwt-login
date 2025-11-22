@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { getUser, registerAdmin, updateUserById, deleteUserById } from '../../services/authService'
+import { getUser, registerAdmin, updateUserById, deleteUserById } from '../services/authService'
 import { useNavigate } from 'react-router-dom'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -8,7 +8,7 @@ import { faMagnifyingGlass, faPlus, faEllipsisVertical, faCircleInfo, faDatabase
 
 import toast, { Toaster } from 'react-hot-toast'
 
-import useStore from "../../../store/store"
+import useStore from "../store/store"
 
 export default function EditUser({ userAll, setUserAll }) {
   const [user, setUser] = useState(null)
@@ -34,8 +34,8 @@ export default function EditUser({ userAll, setUserAll }) {
 
   const { view, setView } = useStore()
 
-  const successNotif = (action) => toast.success(`Success ${action} a new user!`, {duration: 5000,})
-  const failNotif = (action) => toast(`Failed to ${action} a new user`, { icon: <FontAwesomeIcon className="text-[#00bafe]" icon={faCircleInfo} />, duration: 5000})
+  const successNotif = (action) => toast.success(`Success ${action} an user!`, {duration: 5000,})
+  const failNotif = (action) => toast(`Failed to ${action} an user`, { icon: <FontAwesomeIcon className="text-[#00bafe]" icon={faCircleInfo} />, duration: 5000})
 
 
   useEffect(() => {
@@ -111,7 +111,8 @@ export default function EditUser({ userAll, setUserAll }) {
       setRole("")
 
     } catch (err) {
-      console.error('Failed to update user:', err)
+      failNotif("update")
+      console.log('Failed to update user:', err)
     }
   }
 
@@ -128,7 +129,7 @@ export default function EditUser({ userAll, setUserAll }) {
       successNotif("delete")
       setUserAll(prev => prev.filter(user => user._id !== id))
     } catch (err) {
-      console.error('Failed to delete user:', err)
+      console.log('Failed to delete user:', err)
     }
   }
   
@@ -159,17 +160,17 @@ export default function EditUser({ userAll, setUserAll }) {
   }
 
   const getInitials = (name) => { 
-    const words = name.trim().split(/\s+/);
+    const words = name.trim().split(/\s+/)
     
     if (words.length === 1) {
-      return words[0][0].toUpperCase();
+      return words[0][0].toUpperCase()
     }
     
-    return (words[0][0] + words[1][0]).toUpperCase();
+    return (words[0][0] + words[1][0]).toUpperCase()
   }
 
-  const truncateText = (text, limit) => {
-    return text.length > limit ? text.slice(0, limit) + "..." : text;
+  const truncateText = (text = "", limit) => {
+    return text.length > limit ? text.slice(0, limit) + "..." : text
   }
 
 
@@ -178,15 +179,11 @@ export default function EditUser({ userAll, setUserAll }) {
 // --------------------------------------------------- RENDER EMPTY DATA (TABLE & GRID)
 const RenderEmptyData = () => {
   return(
-    <tbody>
-      <tr>
-        <td colSpan="5" className="flex flex-col justify-center items-center min-h-[250px] py-4">
+        <div colSpan="5" className="flex flex-col justify-center items-center min-h-[250px] py-4">
           <div className="flex justify-center items-center text-gray-600 text-3xl bg-gray-100 rounded-full w-15 h-15 "><FontAwesomeIcon icon={faDatabase} /></div>
           <div className="font-semibold text-xl text-gray-800 mt-7">No Data Available</div>
           <div className="text-sm text-gray-600">Please create a new user</div>
-        </td>
-      </tr>
-    </tbody>
+        </div>
   )
 }
 
@@ -251,7 +248,13 @@ const RenderEmptyData = () => {
             </tbody>
           </>
         ) : (
-          <RenderEmptyData />
+          <tbody>
+            <tr>
+              <td>
+              <RenderEmptyData />
+              </td>
+            </tr>
+          </tbody>
         )}
       </table>
     </div>
@@ -266,7 +269,7 @@ const RenderEmptyData = () => {
       {
         filteredUserAll && filteredUserAll.length > 0 ? (
           filteredUserAll?.map((val, i) => (
-          <div className="card rounded-xl border-2 border-[#ebebdd] bg-base-100 card-md">
+          <div key={val._id} className="card rounded-xl border-2 border-[#ebebdd] bg-base-100 card-md">
             <div className="card-body">
 
               <div className="flex justify-between items-center font-medium text-lg leading-7 mb-5">
@@ -418,7 +421,7 @@ const RenderEmptyData = () => {
       <input type="checkbox" id="modal_user_detail" className="modal-toggle" />
       <div className="modal" role="dialog">
         <div className="modal-box max-h-[90%] w-[95vw] md:w-[40vw] max-w-full sm:max-w-lg overflow-x-auto">
-          <h3 className="text-lg font-semibold">Update User Form</h3>
+          <h3 className="text-lg font-semibold">User Information</h3>
           <hr className="my-5 h-[0.05rem] bg-gray-400 border-0" />
           
           <div className="flex flex-col gap-3" onSubmit={(e) => {

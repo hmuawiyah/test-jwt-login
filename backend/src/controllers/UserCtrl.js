@@ -16,9 +16,7 @@ export async function registerCtrl (req, res) {
         
         if (req.user && req.user.role == "admin"){ 
             if ( role == "member" || role == "admin" ){
-                console.log({role})
                 finalRole = role
-                console.log({finalRole})
             }else{
                 return res.status(400).json({ msg: "Failed to register user" })
             }
@@ -26,8 +24,6 @@ export async function registerCtrl (req, res) {
 
         if (!req.user || req.user.role !== "admin") {
             finalRole = "member"
-            console.log("masuk if kedua")
-            console.log(req.user)
         }
         
         const newUser = new User({ userName, email, password: hashedPassword, role:finalRole })
@@ -61,14 +57,20 @@ export async function loginCtrl (req, res) {
     }
 }
 
-export async function profileCtrl (req, res) {
+export async function userCtrl (req, res) {
     const user = req.user
     
     try{
+        res.json({user})
+    }catch(error){
+        res.status(401).json({ msg: "Invalid token" })
+    }
+}
+
+export async function userAllCtrl (req, res) {
+    try{
         const userAll = await User.find().select("-password")
-
-        res.json({user, userAll})
-
+        res.json({userAll})
     }catch(error){
         res.status(401).json({ msg: "Invalid token" })
     }
@@ -81,7 +83,11 @@ export async function updateByIdCtrl(req, res){
     const user = req.user
     
     try{
-        if (user.role !== "admin") return res.status(401).json({ msg:"Access Denied" })
+        if (user.role !== "admin" && user._id.toString() !== id ) return res.status(401).json({ msg:"Access Denied" })
+        // console.log({idnya: id})
+        // console.log(typeof id)
+        // console.log({userid: user._id})
+        // console.log(typeof user._id)
         if (userName) updateData.userName = userName
         if (email) updateData.email = email
         if (role) updateData.role = role

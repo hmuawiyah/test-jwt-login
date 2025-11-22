@@ -11,6 +11,17 @@ const useStore = create(
     setView: (value) => set({ view: value }),
     setContent: (value) => set({ content: value }),
     setUser: (value) => set({ user: value }),
+
+    // logout: () => {
+    //   set({
+    //     user: "",
+    //     view: "table",
+    //     content: "user",
+    //   })
+    //   localStorage.removeItem("app-storage")
+    // },
+
+
     }),{
       name: 'app-storage',
     })

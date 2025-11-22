@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react'
-import { getUser } from '../../services/authService'
+import { getUser } from '../services/authService'
 import { useNavigate } from 'react-router-dom'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome' 
 import { faList, faTableCellsLarge, faTableList, faListCheck } from '@fortawesome/free-solid-svg-icons'
 import { faCircleCheck, faClock, faUser } from '@fortawesome/free-regular-svg-icons'
 
-import useStore from "../../../store/store"
+import useStore from "../store/store"
 
 export default function ProfileUser({ user, userAll, taskAll }) {
   
@@ -121,9 +121,9 @@ export default function ProfileUser({ user, userAll, taskAll }) {
         }
 
 {/* --------------------------------------------------- HR */} 
-        <div className="col-span-12">
+        {/* <div className="col-span-12">
             <hr className="my-1 h-[0.1rem] bg-[#ddddd1] border-0" />
-        </div>
+        </div> */}
 
 {/* --------------------------------------------------- TOGGLE CONTENT */}  
         {

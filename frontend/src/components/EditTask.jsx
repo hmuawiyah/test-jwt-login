@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getUser } from '../../services/authService'
-import { getTask, postTask, updateTaskById, deleteTaskById } from '../../services/taskService'
+import { getUser } from '../services/authService'
+import { getTask, postTask, updateTaskById, deleteTaskById } from '../services/taskService'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTrashCan, faPenToSquare, faUser } from '@fortawesome/free-regular-svg-icons'
@@ -9,7 +9,7 @@ import { faMagnifyingGlass, faCircleInfo, faPlus, faEllipsisVertical, faDatabase
 
 import toast, { Toaster } from 'react-hot-toast'
 
-import useStore from "../../../store/store"
+import useStore from "../store/store"
 
 
 export default function EditTask({ user, setUser, userAll, setUserAll, taskAll, setTaskAll }) {
@@ -38,14 +38,14 @@ export default function EditTask({ user, setUser, userAll, setUserAll, taskAll, 
   const successNotif = (action) => toast.success(`Success ${action} a new task!`, {duration: 5000,})
   const failNotif = (action) => toast(`Failed to ${action} a new task`, { icon: <FontAwesomeIcon className="text-[#00bafe]" icon={faCircleInfo} />, duration: 5000})
 
-  useEffect(() => {
-    const token = localStorage.getItem('token')
-    if (!token) {
-      navigate('/login')
-      return
-    }
+  // useEffect(() => {
+  //   const token = localStorage.getItem('token')
+  //   if (!token) {
+  //     navigate('/login')
+  //     return
+  //   }
       
-  }, [navigate])
+  // }, [navigate])
 
   const handleRegisterTask = async (e, title, description, staffId, status, level) => {
     e.preventDefault()
@@ -106,7 +106,7 @@ export default function EditTask({ user, setUser, userAll, setUserAll, taskAll, 
       setLevel("")
 
     } catch (err) {
-      console.error('Failed to update user:', err)
+      console.log('Failed to update user:', err)
     }
   }
 
@@ -123,7 +123,7 @@ export default function EditTask({ user, setUser, userAll, setUserAll, taskAll, 
       successNotif("delete")
       setTaskAll(prev => prev.filter(user => user._id !== id))
     } catch (err) {
-      console.error('Failed to delete task:', err)
+      console.log('Failed to delete task:', err)
     }
   }
 
@@ -162,22 +162,18 @@ export default function EditTask({ user, setUser, userAll, setUserAll, taskAll, 
       return newDate
   }
 
-  const truncateText = (text, limit) => {
-    return text.length > limit ? text.slice(0, limit) + "..." : text;
+  const truncateText = (text = "", limit) => {
+    return text.length > limit ? text.slice(0, limit) + "..." : text
   }
 
   // --------------------------------------------------- RENDER EMPTY DATA (TABLE & GRID)
   const RenderEmptyData = () => {
     return(
-      <tbody>
-        <tr>
-          <td colSpan="5" className="flex flex-col justify-center items-center min-h-[250px] py-4">
+          <div colSpan="5" className="flex flex-col justify-center items-center min-h-[250px] py-4">
             <div className="flex justify-center items-center text-gray-600 text-3xl bg-gray-100 rounded-full w-15 h-15 "><FontAwesomeIcon icon={faDatabase} /></div>
             <div className="font-semibold text-xl text-gray-800 mt-7">No Data Available</div>
             <div className="text-sm text-gray-600">Please create a new task</div>
-          </td>
-        </tr>
-      </tbody>
+          </div>
     )
   }
 
@@ -206,6 +202,7 @@ export default function EditTask({ user, setUser, userAll, setUserAll, taskAll, 
               <tr key={val._id}>
                   <td>{truncateText(val.title, 24)}</td>
                   {user.role === "admin" && (
+                    // <td>{val.staffId?.userName}</td>
                   <td>{truncateText(val.staffId?.userName, 18)}</td>
                   )}
                   <td className="hidden md:table-cell">
@@ -230,7 +227,7 @@ export default function EditTask({ user, setUser, userAll, setUserAll, taskAll, 
                   <td className="flex justify-center gap-2">
                     <button className="btn btn-soft btn-info btn-sm rounded-lg" onClick={() => {
                       tempValues({
-                        id:val._id, title:val.title, description:val.description, assignedBy:val.assignedBy.userName,
+                        id:val._id, title:val.title, description:val.description, assignedBy:val.assignedBy?.userName,
                         staffId:val.staffId.userName, staffRole:val.staffId.role, status:val.status, level:val.level, createdAt:val.createdAt, updatedAt:val.updatedAt
                       })
                       setTimeout(() => {
@@ -260,7 +257,13 @@ export default function EditTask({ user, setUser, userAll, setUserAll, taskAll, 
           </tbody>
           </>
             ):(
-          <RenderEmptyData />
+              <tbody>
+                <tr>
+                  <td>
+                  <RenderEmptyData />
+                  </td>
+                </tr>
+              </tbody>
             )}
         </table>
       </div>
@@ -275,7 +278,7 @@ export default function EditTask({ user, setUser, userAll, setUserAll, taskAll, 
       {
         filteredTaskAll && filteredTaskAll.length > 0 ? (
           filteredTaskAll?.map((val, i) => (
-          <div className="card rounded-xl border-2 border-[#ebebdd] bg-base-100 card-md">
+          <div key={val._id} className="card rounded-xl border-2 border-[#ebebdd] bg-base-100 card-md">
             <div className="card-body">
 
               <div className="flex justify-between items-center font-medium text-lg leading-6 mb-2">
@@ -456,7 +459,7 @@ export default function EditTask({ user, setUser, userAll, setUserAll, taskAll, 
       <input type="checkbox" id="modal_task_detail" className="modal-toggle" />
       <div className="modal" role="dialog">
         <div className="modal-box max-h-[90%] w-[95vw] md:w-[40vw] max-w-full sm:max-w-lg md:max-w-3xl overflow-x-auto">
-          <h3 className="text-lg font-semibold">Detail Task Form</h3>
+          <h3 className="text-lg font-semibold">Task Information</h3>
           <hr className="my-5 h-[0.05rem] bg-gray-400 border-0" />
           
           <div className="flex flex-col gap-3" onSubmit={(e) => {

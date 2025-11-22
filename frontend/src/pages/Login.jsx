@@ -2,8 +2,8 @@ import React, { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { getUser, login } from '../services/authService'
 
-import Navbar from './components/Navbar'
-import useStore from "../../store/store"
+import Navbar from '../components/Navbar'
+import useStore from "../store/store"
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCircleInfo, faRightToBracket } from '@fortawesome/free-solid-svg-icons'
@@ -17,8 +17,8 @@ export default function Login() {
   const navigate = useNavigate()
   const { setUser } = useStore()
 
-  const successNotif = (action) => toast.success(`Success ${action} a new user!`, {duration: 5000,})
-  const failNotif = (action) => toast(`Failed to ${action} a new user`, { icon: <FontAwesomeIcon className="text-[#00bafe]" icon={faCircleInfo} />, duration: 5000 },)
+  const successNotif = (action) => toast.success(`${action} success!`, {duration: 5000,})
+  const failNotif = (action) => toast(`Failed to ${action}`, { icon: <FontAwesomeIcon className="text-[#00bafe]" icon={faCircleInfo} />, duration: 5000 },)
 
 
   const handleSubmit = async e => {
@@ -36,11 +36,11 @@ export default function Login() {
       // setUserAll(userRes.data.userAll)
 
       // alert("Login success!")
-      successNotif("create")
+      successNotif("login")
       
       navigate('/dashboard')
     } catch (err) {
-      failNotif("create")
+      failNotif("login")
       localStorage.removeItem("token")
     }
   }
@@ -55,14 +55,14 @@ export default function Login() {
       <div className="grid grid-cols-1 md:grid-cols-12 justify-center xl:justify-between m-12 lg:mt-10 min-h-[580px] mx-auto border-2 border-[#ebebdd] rounded-2xl">
 
         <div className="col-span-7 xl:col-span-8 hidden md:flex justify-center items-center">
-          <div className="relative w-full h-full bg-[url('https://images.unsplash.com/photo-1726796065425-475e3fb7c12a')] bg-center bg-cover rounded-l-2xl overflow-hidden">
+          <div className="relative w-full h-full bg-[url('https://images.unsplash.com/photo-1709715357441-da1ec3d0bd4a?w=1000&q=80&auto=format')] bg-center bg-cover rounded-l-2xl overflow-hidden">
         
             {/* Overlay gelap */}
             <div className="absolute inset-0 bg-black/50 z-10" />
 
             {/* Teks di atas overlay */}
             <div className="absolute z-20 w-full text-center text-white font-medium text-3xl top-1/2 -translate-y-1/2">
-              <h5>One place for every<br/>task and user</h5>
+              <h5>Stay organized with<br />powerful tools for users</h5>
             </div>
 
           </div>

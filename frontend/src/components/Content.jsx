@@ -9,8 +9,14 @@ export default function Content1() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center mt-12 lg:mt-30">
              
                 <div className="mx-3 lg:mx-0 lg:col-span-5">
-                    <div className="bg-[url(https://images.unsplash.com/photo-1726796065425-475e3fb7c12a)]
-                    w-full h-55 md:h-85 bg-center bg-cover rounded-2xl" />
+                    {/* <div className="bg-[url(https://images.unsplash.com/photo-1726796065425-475e3fb7c12a)]
+                    w-full h-55 md:h-85 bg-center bg-cover rounded-2xl" /> */}
+
+                    <img
+                    src="https://images.unsplash.com/photo-1709715357528-1d3d78ed6cfc?w=1000&q=80&auto=format"
+                    className="w-full h-85 object-cover rounded-2xl"
+                    loading="lazy"
+                    />
                 </div>
 
                 <div className="lg:col-span-6 flex flex-col items-start justify-between h-85">
@@ -24,7 +30,7 @@ export default function Content1() {
                     <div className="flex gap-2 items-center justify-start">
                         <Link to={"/register"}>
                             <button className="
-                                cursor-pointer btn bg-[#f8f34c] rounded-lg text-[#181600] text-lg border-[#f8f34c] w-28 h-11 shadow-none 
+                                cursor-pointer btn bg-[#f8f34c] rounded-lg text-[#181600] text-lg border-[#f8f34c] shadow-none 
                                 hover:bg-[#cec92e] hover:border-[#cec92e]">
                                     
                                 <h5>Register</h5>    
@@ -33,12 +39,10 @@ export default function Content1() {
 
                         <Link to={"/login"}>
                             <button className="
-                                flex justify-between items-center p-0 border-none text-lg
-                                cursor-pointer btn bg-[#394040] rounded-lg text-[#efefef] w-28 h-11 shadow-none hover:bg-[#1e2525] group
+                                btn border-none text-lg cursor-pointer shadow-none rounded-lg
+                                bg-[#394040] text-[#efefef] hover:bg-[#1e2525]
                                 
-                                [&_h5]:flex [&_h5]:items-center [&_h5]:gap-0 [&_h5]:ml-3
-                                [&_span]:bg-[#f8f34c] [&_span]:text-[#394040] [&_span]:group-hover:bg-[#cec92e] [&_span]:group-hover:border-[#cec92e]
-                                [&_span]:shadow-none [&_span]:btn [&_span]:w-0 [&_span]:px-3 [&_span]:h-6 [&_span]:mr-2.5 [&_span]:border-none [&_span]:text-lg">
+                                [&_span]:text-lg [&_span]:text-[#f8f34c] [&_span]:shadow-none [&_span]:border-none ">
                                 
                                 <h5>Login </h5><span><FontAwesomeIcon icon={faRightToBracket} /></span>
                             </button>
